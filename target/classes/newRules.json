@@ -1,0 +1,50 @@
+[
+  {
+    "tech": true,
+    "paper": 2,
+    "jam": true,
+    "available": false,
+    "warning": true,
+    "rep": true
+  },
+  {
+    "tech": true,
+    "paper": 1,
+    "jam": true,
+    "available": false,
+    "warning": true,
+    "rep": true
+  },
+  {
+    "tech": true,
+    "paper": 0,
+    "jam": true,
+    "available": false,
+    "warning": false,
+    "rep": false
+  },
+  {
+    "tech": false,
+    "paper": 2,
+    "jam": false,
+    "available": false,
+    "warning": true,
+    "rep": true
+  },
+  {
+    "tech": false,
+    "paper": 1,
+    "jam": false,
+    "available": true,
+    "warning": true,
+    "rep": true
+  },
+  {
+    "tech": false,
+    "paper": 0,
+    "jam": false,
+    "available": true,
+    "warning": false,
+    "rep": false
+  }
+]
