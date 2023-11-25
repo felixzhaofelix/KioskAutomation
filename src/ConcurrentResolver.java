@@ -6,7 +6,7 @@ import java.util.concurrent.Future;
 
 public class ConcurrentResolver {
 
-    public static void resolveConcurrently(List<Scenario> scenarios, List<Rule> rules) {
+    public static synchronized void resolveConcurrently(List<Scenario> scenarios, List<Rule> rules) {
         ExecutorService executorService = Executors.newFixedThreadPool(scenarios.size());
         List<Future<?>> futures = new ArrayList<>();
 
