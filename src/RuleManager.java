@@ -30,17 +30,21 @@ public class RuleManager {
 
 
 
-    private static List<Rule> createRules() {
+    public static List<Rule> createRules() {
         List<Rule> rules = new ArrayList<>();
-
         // Create Rule objects and add to the list
+        //default rules
         rules.add(new Rule(true, 2, true, true, true,false)); //jam, no paper
         rules.add(new Rule(true, 1, true, true, true,false)); //jam, low paper
         rules.add(new Rule(true, 0, true, false, false, false)); //jam, high paper
         rules.add(new Rule(false, 2, false, true, true, false)); //no jam, no paper
         rules.add(new Rule(false, 1, false, true, true, true)); //no jam, low paper
         rules.add(new Rule(false, 0, false, false, false,true)); //no jam, high paper
+        return rules;
+    }
 
+    public static List<Rule> createRules(List<Rule> newRules) {
+        List<Rule> rules = newRules;
         return rules;
     }
 

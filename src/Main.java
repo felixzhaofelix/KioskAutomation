@@ -12,16 +12,39 @@ public class Main {
 
         // User input for scenarios
         Scanner scanner = new Scanner(System.in);
+
         //welcome message
         System.out.println("\nKiosk Automation System\n");
-        System.out.print("Enter the number of scenarios: ");
-        int numScenarios = scanner.nextInt();
 
-        for (int i = 1; i <= numScenarios; i++) {
-            System.out.println("\nScenario " + i + ":");
-            Scenario scenario = createScenario(scanner);
-            scenarios.add(scenario);
+        System.out.println("Use user defined scenarios? (true or false): ");
+        boolean userDefined = scanner.nextBoolean();
+        if (userDefined) {
+            System.out.print("Enter the number of scenarios: ");
+            int numScenarios = scanner.nextInt();
+
+            for (int i = 1; i <= numScenarios; i++) {
+                System.out.println("\nScenario " + i + ":");
+                Scenario scenario = createScenario(scanner);
+                scenarios.add(scenario);
+            }
+        } else {
+            System.out.println("Generating default scenarios");
+            System.out.println("loading ...........................");
+            Scenario scenario1 = new Scenario("CarRental", true, 1);
+            Scenario scenario2 = new Scenario("Park", false, 1);
+            Scenario scenario3 = new Scenario("Ticket Shop", true, 1);
+            Scenario scenario4 = new Scenario("Main Hall", false, 2);
+            Scenario scenario5 = new Scenario("Restaurant", false, 1);
+            Scenario scenario6 = new Scenario("Atrium", false, 0);
+
+            scenarios.add(scenario1);
+            scenarios.add(scenario2);
+            scenarios.add(scenario3);
+            scenarios.add(scenario4);
+            scenarios.add(scenario5);
+            scenarios.add(scenario6);
         }
+
         // Close the scanner
         scanner.close();
 
@@ -58,21 +81,8 @@ public class Main {
 //public class Main{
 //    public static void main(String[] args) {
 //
-//        //create scenarios
-//        Scenario scenario1 = new Scenario("CarRental", true, 1);
-//        Scenario scenario2 = new Scenario("Park", false, 1);
-//        Scenario scenario3 = new Scenario("Ticket Shop", true, 1);
-//        Scenario scenario4 = new Scenario("Main Hall", false, 2);
-//        Scenario scenario5 = new Scenario("Restaurant", false, 1);
-//        Scenario scenario6 = new Scenario("Atrium", false, 0);
-//
-//        List<Scenario> scenarios = new ArrayList<>();
-//        scenarios.add(scenario1);
-//        scenarios.add(scenario2);
-//        scenarios.add(scenario3);
-//        scenarios.add(scenario4);
-//        scenarios.add(scenario5);
-//        scenarios.add(scenario6);
+        //create scenarios
+
 //
 //        //show scenarios
 //        Status.setScenarios(scenarios);
