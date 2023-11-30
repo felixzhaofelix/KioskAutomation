@@ -1,5 +1,6 @@
 # kiosk-automation
 
 ```bash
-git clone https://github.com/felixzhaofelix/kiosk-automation.git
+git clone -b master https://github.com/felixzhaofelix/kiosk-automation.git
+
 ```
