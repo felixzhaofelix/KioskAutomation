@@ -57,7 +57,6 @@ public class Main {
         Status.assessStatuses();
         System.out.println();
         //resolve scenarios
-//        ConcurrentResolver.resolveConcurrently(scenarios, rules);
         Resolver resolver = new Resolver(rules);
         resolver.resolveAll(scenarios);
 

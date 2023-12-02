@@ -37,7 +37,7 @@ public class Resolver {
                         scenario.setPaper(0); //set paper to high(0), Rule 5 become Rule 6
                         break;
                     } else { //Rule 6
-                        solution.addStep("Kiosk " + scenario.getName() + " is available");
+                        solution.addStep("Kiosk " + scenario.getName() + " is available and has high paper level");
                         rule.applies(scenario); //remove warning and set kiosk to available
                         break;
                     }
