@@ -18,7 +18,18 @@ public class Solution {
 
     public void printSolution() {
         for (String step : steps) {
+            if (step.equals("loading")) {
+                addDelay();//add delay but dont print "loading"
+                continue;
+            }
             System.out.println(step);
+        }
+    }
+    public void addDelay() {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

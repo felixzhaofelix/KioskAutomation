@@ -16,18 +16,21 @@ public class Resolver {
             for (Rule rule : rules) {
                 if (rule.matches(scenario)) {
                     if (rule.isTech()) { //Rule 1 or 2 or 3
-                        solution.addStep(scenario.getName() + " is unavailable because of paper jam");
+                        solution.addStep("Kiosk " + scenario.getName() + " is unavailable because of paper jam");
+                        solution.addStep("loading");
                         solution.addStep("Agent 1 Technician has removed the jam from Kiosk " + scenario.getName());
                         scenario.setJam(false); //remove jam Rule 123 become Rule 456
                         break;
                     } else if (rule.isRep() && rule.isWarning() && !rule.isAvailable()) { //Rule 4
-                        solution.addStep(scenario.getName() + " is unavailable because out of paper");
+                        solution.addStep("Kiosk " + scenario.getName() + " is unavailable because out of paper");
+                        solution.addStep("loading");
                         solution.addStep("Agent 2 Representative has added a new roll to Kiosk " + scenario.getName());
                         scenario.setPaper(0); //set paper to high(0), Rule 4 become Rule 6
                         scenario.setWarning(false); //remove warning
                         break;
                     } else if (rule.isRep() && rule.isWarning() && rule.isAvailable()) { //Rule 5
-                        solution.addStep(scenario.getName() + " is available because no jam and low paper");
+                        solution.addStep("Kiosk " + scenario.getName() + " is available because no jam and low paper");
+                        solution.addStep("loading");
                         solution.addStep("Agent 2 Representative has added a new roll to Kiosk " + scenario.getName());
                         scenario.setPaper(0); //set paper to high(0), Rule 5 become Rule 6
                         break;
@@ -53,13 +56,7 @@ public class Resolver {
         }
     }
 
-    public void addDelay() {
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
+
 
 }
 
