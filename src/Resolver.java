@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class Resolver {
     private List<Rule> rules;
@@ -51,6 +53,8 @@ public class Resolver {
     } // end resolve method
 
     public void resolveAll(List<Scenario> scenarios) {
+        Collections.shuffle(scenarios);
+
         for (Scenario scenario : scenarios) {
             resolve(scenario);
         }
