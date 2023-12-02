@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.example</groupId>
-    <artifactId>your-project-name</artifactId>
+    <artifactId>KioskAutomation</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>

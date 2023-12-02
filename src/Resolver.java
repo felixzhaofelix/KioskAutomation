@@ -37,7 +37,11 @@ public class Resolver {
                         break;
                     }
                 }
+
+
             } // end for loop
+
+
         } while (!scenario.isAvailable() || scenario.isWarning());
 
         solution.printSolution();
@@ -46,6 +50,14 @@ public class Resolver {
     public void resolveAll(List<Scenario> scenarios) {
         for (Scenario scenario : scenarios) {
             resolve(scenario);
+        }
+    }
+
+    public void addDelay() {
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 

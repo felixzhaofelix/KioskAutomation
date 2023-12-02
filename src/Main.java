@@ -78,21 +78,3 @@ public class Main {
 
 
 
-//public class Main{
-//    public static void main(String[] args) {
-//
-        //create scenarios
-
-//
-//        //show scenarios
-//        Status.setScenarios(scenarios);
-//        Status.showScenarios(scenarios);
-//        System.out.println();
-//        //show statuses
-//        Status.assessStatuses();
-//        System.out.println();
-//
-//
-//
-//    }
-//}
