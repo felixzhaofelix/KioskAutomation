@@ -4,8 +4,7 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        //load rules from json
-        List<Rule> rules = RuleManager.loadRulesFromJson("src/newRules.json"); //load rules from json file
+
 
         //create scenarios
         List<Scenario> scenarios = new ArrayList<>();
@@ -15,6 +14,12 @@ public class Main {
 
         //welcome message
         System.out.println("\nKiosk Automation System\n");
+
+        //prompt user for the rules to be used
+        System.out.println("Please provide filename for the rules to be used: (for default rules, enter \"src/Rules.json\")");
+        String filename = scanner.next();
+        //load rules from json
+        List<Rule> rules = RuleManager.loadRulesFromJson(filename); //load rules from json file
 
         System.out.println("Use user defined scenarios? (true or false): ");
         boolean userDefined = scanner.nextBoolean();
@@ -54,12 +59,15 @@ public class Main {
         Status.showScenarios(scenarios);
         System.out.println();
         //show statuses
+        Status.setRules(rules);
         Status.assessStatuses();
         System.out.println();
         //resolve scenarios
         Resolver resolver = new Resolver(rules);
-        resolver.resolveAll(scenarios);
-
+        List<Solution> solutions = resolver.resolveAll(scenarios);
+        for (Solution solution : solutions) {
+            solution.printSolution();
+        }
     }
 
 

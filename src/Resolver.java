@@ -10,7 +10,13 @@ public class Resolver {
         this.rules = rules;
     }
 
-    public void resolve(Scenario scenario) {
+    /**
+     * Resolves a scenario based on the provided rules.
+     *
+     * @param scenario Scenario object to be resolved.
+     * @return Solution object containing the steps to resolve the scenario.
+     */
+    public Solution resolve(Scenario scenario) {
         Solution solution = new Solution();
         //DO WHILE
 
@@ -35,6 +41,7 @@ public class Resolver {
                         solution.addStep("loading");
                         solution.addStep("Agent 2 Representative has added a new roll to Kiosk " + scenario.getName());
                         scenario.setPaper(0); //set paper to high(0), Rule 5 become Rule 6
+                        scenario.setWarning(false); //remove warning
                         break;
                     } else { //Rule 6
                         solution.addStep("Kiosk " + scenario.getName() + " is available and has high paper level");
@@ -42,22 +49,28 @@ public class Resolver {
                         break;
                     }
                 }
-
-
-            } // end for loop
+            }
 
 
         } while (!scenario.isAvailable() || scenario.isWarning());
 
-        solution.printSolution();
-    } // end resolve method
+        return solution;
+    }
 
-    public void resolveAll(List<Scenario> scenarios) {
+    /**
+     * Resolves all scenarios based on the provided rules.
+     *
+     * @param scenarios List of Scenario objects to be resolved.
+     * @return List of Solution objects containing the steps to resolve the scenarios in an random order.
+     */
+    public List<Solution> resolveAll(List<Scenario> scenarios) {
+        List<Solution> solutions = new ArrayList<>();
         Collections.shuffle(scenarios);
 
         for (Scenario scenario : scenarios) {
-            resolve(scenario);
+            solutions.add(resolve(scenario));
         }
+        return solutions;
     }
 
 

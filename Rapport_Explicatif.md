@@ -64,24 +64,16 @@ Rule:
 
 Correspondance:
 ```
-
-/Scenario
-|                           Les prémisses:                                    Les conclusions:
-|                                 ↑                                                  ↑
-|                   |------------------------| |-------------------------------------------------------------|    
-|                   |                        | |                                                             |
-↓                   ↓                        ↓ ↓                                                             ↓
-{ "name": "Kiosk 1", "jam": true, "paper": 0, "warning": ---- , "available": ----                              } 
-                    |  ↑                 ↑   |       ↑                 ↑           |                         |                                                           
-                    |    les conditions      |            les états                |        les actions      |                            
-                    |  ↓                 ↓   |       ↓                 ↓           |    ↓             ↓      | 
-{                    "jam": true, "paper": 0, "warning": false, "available": false, "tech": true, "rep": false }
-↑
-|
-|
-|
-|
-\Rule:
+                                   Les prémisses:                                    Les conclusions:
+                                          ↑                                                  ↑
+                              |------------------------| |-------------------------------------------------------------|    
+                              |                        | |                                                             |
+                              ↓                        ↓ ↓                                                             ↓
+Scenario: { "name": "Kiosk 1", "jam": true, "paper": 0, "warning": ---- , "available": ----                              } 
+                              |  ↑                 ↑   |       ↑                 ↑           |                         |                                                           
+                              |    les conditions      |            les états                |        les actions      |                            
+                              |  ↓                 ↓   |       ↓                 ↓           |    ↓             ↓      | 
+Rule:     {                    "jam": true, "paper": 0, "warning": false, "available": false, "tech": true, "rep": false }
 ```
 
 ```

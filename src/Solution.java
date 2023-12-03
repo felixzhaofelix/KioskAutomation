@@ -8,24 +8,30 @@ public class Solution {
         this.steps = new ArrayList<>();
     }
 
+    /**
+     * Adds a step to the solution.
+     *
+     * @param step Step to be added to the solution.
+     */
     public void addStep(String step) {
         steps.add(step);
     }
 
-    public List<String> getSteps() {
-        return steps;
-    }
-
+    /**
+     * Prints the solution.
+     */
     public void printSolution() {
         for (String step : steps) {
             if (step.equals("loading")) {
-                addDelay();//add delay but dont print "loading"
+                addDelay();//add delay but don't print "loading"
                 continue;
             }
             System.out.println(step);
         }
     }
-    public void addDelay() {
+
+
+    private void addDelay() {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
