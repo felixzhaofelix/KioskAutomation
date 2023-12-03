@@ -84,9 +84,6 @@ Correspondance:
 \Rule:
 ```
 
-```
-----------------↑↓↘↙→←
-```
 
 Une fois la règle trouvée, l'objet Status va présenter la situation initiale des scénarios et les agents disponibles.
 
