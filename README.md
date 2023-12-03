@@ -299,7 +299,7 @@ En même temps, elle invoque la méthode Collection.shuffle() pour mélanger la 
 Voici les principales méthodes de la classe Resolver:
 
 ```java
-public class Resovler{
+public class Resolver{
     /**
      * Resolves a scenario based on the provided rules.
      *
