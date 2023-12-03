@@ -393,3 +393,6 @@ Pour résoudre ces problèmes, il faut utiliser une structure de données plus c
 et utiliser des algorithmes plus avancés pour trouver la solution finale, par contre, nous n'avons que six possibilités à considérer pour
 le moment, ce qui limite notre imagination pour trouver une solution avec une évolutivité plus grande.
 
+Concernant la priorité des règles, elles n'ont pas de priorité les unes sur les autres, ce qui veut dire qu'aucun scénario ne peut 
+se correspondre avec deux règles en même temps.
+
