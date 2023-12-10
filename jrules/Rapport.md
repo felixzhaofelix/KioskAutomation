@@ -37,7 +37,7 @@ Ils sont peuvent être modifiés au cours du fonctionnement du système.
 
 
 Voici le UML du système:
-![UML du système](Jrules_Objects_Definition_UML.png)
+![UML du système](https://github.com/felixzhaofelix/KioskAutomation/blob/master/jrules/Jrules_Objects_Definition_UML.png)
 
 ## Les règles
 Les règles sont définies dans le but d'être déclenchées duran trois phases différentes
