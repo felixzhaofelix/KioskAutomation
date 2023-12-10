@@ -83,7 +83,23 @@ Correspondance:
 |
 \Rule:
 ```
+Voici l'interprétation du scénario ci-haut :
+Le kiosque au nom de "Kiosk 1" a un bourrage de papier et le niveau de papier est haut.
+Voici l'interprétation de la règle ci-haut :
 
+```
+Si:
+
+le kiosque a un bourrage de papier et le niveau de papier est haut, 
+
+Alors:
+
+un technicien est requis pour réparer le kiosque et un représentant n'est pas requis pour remplir le kiosque.
+
+Et:
+
+Il n'y a pas d'avertissement pour le remplissage de papier et le kiosque est non disponible.
+```
 
 Une fois la règle trouvée, l'objet Status va présenter la situation initiale des scénarios et les agents disponibles.
 

@@ -1,0 +1,483 @@
+this is the file containing all the rules for the kiosk system in jrules syntax
+heres some non standardized stuff to make up rules
+
+lets start with objects and their available attributes
+
+:Object InitialScreen shows the initial conditions of the kiosk system, it displays as many
+kiosks as there are in the system and shows their status, each kiosk only once and when all
+kiosks are displayed, it shows the number of agents available and the initial screen is removed from the system
+
+InitialScreen
+---------------------------------
+-numOfKiosks: {int} //initialized as the number of kiosks in the system, decremented by 1 each time a kiosk is displayed
+-numOfAgents: {int} //initialized as the number of agents in the system, decremented by 1 each time an agent is displayed
+-isOn: {true, false} //initialized as true, set to false when all kiosks and agents are displayed
+
+:Object Kiosk shows the status of a kiosk, it displays the name of the kiosk, the jam status, the paper level, and the availability
+of the kiosk, it is displayed after the initial screen is removed and is removed from the system after it is displayed
+
+StatusScreen
+---------------------------------
+-numOfKiosks: {int} //initialized as the number of kiosks in the system, decremented by 1 each time a kiosk is displayed
+-isOn: {true, false} //initialized as true, set to false when all kiosks are displayed
+
+SolutionScreen
+---------------------------------
+isOn: {true, false} //initialized as true, set to false when all kiosks are available
+
+Agent
+---------------------------------
+-title: {technician, representative}
+-number: {int}
+-availability: {available, not Available}
+
+Kiosk
+---------------------------------
+-name: {string}
+-number: {int}
+-jam: {jammed, not jammed}
+-paper: {high paper, low paper, out of paper}
+-availability: {available, not available}
+-initialScenarioPrinted: {true, false}
+-initialStatusPrinted: {true, false}
+
+
+
+
+so here are the statements about some Kiosk instance in jrule syntax:
+a kiosk named "kiosk1" is not jammed, has high paper level, and is available is expressed as:
+Kiosk(name=="kiosk1", jam=="notJammed", paper=="high", availability=="available");
+
+a kiosk named "kiosk2" is jammed, has low paper level, and is not available is expressed as:
+Kiosk(name=="kiosk2", jam=="jammed", paper=="low", availability=="notAvailable");
+
+here's some actions that can be taken on a kiosk:
+Action 1: to create a kiosk, we use the following syntax:
+
+assert Kiosk("kiosk1", "notJammed", "high", "available");
+
+Action 2: to delete a kiosk, we use the following when-then syntax:
+
+    when
+        ?x: Kiosk(name=="kiosk1", jam=="notJammed", paper=="high", availability=="available");
+    then
+        retract ?x;
+Action 3: to update a kiosk, we use the following when-then syntax:
+
+    when
+        ?x: Kiosk(name equals "kiosk1"; jam equals "notJammed"; paper equals "high"; availability equals "available");
+
+    then
+        modify ?x {
+            jam = "jammed";
+            paper = "low";
+            availability = "notAvailable";
+        };
+
+
+now lets talk about the rules
+rules are made up of conditions and actions and can have priorities
+the conditions are the when part of the rule and the actions are the then part of the rule
+the conditions are made up of a set of statements that are evaluated to be true or false
+the actions are made up of a set of statements that are executed when the conditions are true
+there are also ways to determine which rule to apply first
+-by priority: the rule with the highest priority is applied first
+-by refraction: the rule that was applied last is not applied until a new fact is asserted
+-by recency: the rule that was created last is applied first
+-by lexicography: the rule that comes first in the alphabet is applied first
+
+here's an example of a rule:
+/*
+ * This rule is used to fix a jammed kiosk
+ * if a kiosk is jammed, then a tech is called to remove the jam
+ */
+rule callTechToRemoveJam {
+    when {
+        ?k: Kiosk(jam=="jammed");
+    }
+    then {
+        System.out.println("a tech removes jam from " + ?k.name);
+        modify ?k {
+            jam = "notJammed";
+        };
+    }
+};
+
+heres that same rule but with a removesJam() function implemented in Kiosk class:
+/*
+ * This rule is used to fix a jammed kiosk
+ * if a kiosk is jammed, then a tech is called to remove the jam
+ */
+rule callTechToRemoveJam {
+    when {
+        ?k: Kiosk(jam=="jammed");
+    }
+    then {
+        ?k.removesJam(); //this is the same as the modify statement in the previous rule
+    }
+};
+
+now heres the workflow for the kiosk system:
+-we initialize the kiosk system with a set of kiosks
+-we initialize a InitialScreen object with the number of kiosks and agents in the system
+-we then display the initial screen
+-after the initial screen is displayed, we display the StatusScreen object
+-after the status screen is displayed, we display the SolutionScreen object
+(every screen has a method to print its title)
+(now we are solving the problems)
+-we first check every kiosk's jam and paper status and display their availability and the reasons
+(we will implement a method in the Kiosk class to display the availability and reasons)
+-if a kiosk is jammed, we call a technician to remove the jam
+-we display the availability and reasons again
+-if a kiosk is low on paper, we call a representative to refill the paper
+-we display the availability and reasons again
+
+lets focus firs on the core part: where kiosks get fixed
+setup {
+assert Kiosk("CarRental", "jammed", "low paper", "not available");
+assert Kiosk("Park", "not jammed", "low paper", "available");
+assert Agent("Technician", 1, "available");
+assert Agent("Representative", 2, "available");
+assert SolutionScreen(isOn ==true);
+}
+
+lets figure out all the combinations of kiosk statuses and their solutions
+1. kiosk is jammed and high on paper
+2. kiosk is jammed and low on paper
+3. kiosk is jammed and out of paper
+4. kiosk is not jammed and high on paper
+5. kiosk is not jammed and low on paper
+6. kiosk is not jammed and out of paper
+
+first got assess availability with high priority
+then display their availability with medium priority
+then fix them with low priority
+
+rule isAvailable {
+    priority = high;
+    when {
+        ?k: Kiosk(jam=="not jammed"; ~paper=="out of paper"); //the ~ means not
+    }
+    then {
+        modify ?k {
+            availability = "available";
+        };
+    }
+};
+
+rule isNotAvailableBecauseJam {
+    priority = high;
+    when {
+        ?k: Kiosk(jam=="jammed");
+    }
+    then {
+        modify ?k {
+            availability = "not available";
+        };
+    }
+};
+
+rule isNotAvailableBecausePaper {
+    priority = high;
+    when {
+        ?k: Kiosk(paper=="out of paper");
+    }
+    then {
+        modify ?k {
+            availability = "not available";
+        };
+    }
+};
+
+rules to assess availability and reasons: (these rules get fired once and are not triggered again until a new fact is added)
+rule isJammed {
+    priority = medium;
+    when {
+        ?k: Kiosk(jam=="jammed");
+        ?s: ~SolutionScreen(isOn == false); //this rule will not be triggered as long as SolutionScreen is not displayed
+    }
+    then {
+        System.out.println(?k.name + " is not available because paper jam");
+    }
+};
+
+rule isPaperOut {
+    priority = medium;
+    when {
+        ?k: Kiosk(paper=="out of paper");
+        ?s: ~SolutionScreen(isOn == false); //this rule will not be triggered as long as SolutionScreen is not displayed
+    }
+    then {
+        System.out.println(?k.name + " is not available because out of paper");
+    }
+};
+
+rule isPaperHigh{
+    priority = medium;
+    when {
+        ?k: Kiosk(paper=="high paper"; jam=="not jammed");
+        ?s: ~SolutionScreen(isOn == false); //this rule will not be triggered as long as SolutionScreen is not displayed
+    }
+    then {
+        System.out.println(?k.name + " is available");
+    }
+};
+
+rule isPaperLow{
+    priority = medium;
+    when {
+        ?k: Kiosk(paper=="low paper"; jam=="not jammed");
+        ?s: ~SolutionScreen(isOn == false); //this rule will not be triggered as long as SolutionScreen is not displayed
+    }
+    then {
+        System.out.println(?k.name + " is available" because no jam and low paper);
+    }
+};
+
+rules to fix kiosks: (these will add a new fact to the working memory and will trigger the previous rules again)
+they have their number of priority in their name, lower numbers get executed first
+i.e.: first fix jam, then refill out of paper, then refill low paper
+rule 1callTechToRemoveJam {
+    when {
+        ?k: Kiosk(jam=="jammed");
+        ?s: ~SolutionScreen(isOn == false);
+        ?a: Agent(title=="technician"; availability=="available");
+    }
+    then {
+        modify ?a {
+            availability = "not available";
+        };
+        System.out.println("a tech removes jam from " + ?k.name);
+        modify ?k {
+            jam = "notJammed";
+        };
+        modify ?a {
+            availability = "available";
+        };
+    }
+};
+
+rule 2callRepToRefillPaper {
+    when {
+        ?k: Kiosk(paper=="out of paper"; jam=="not jammed");
+        ?s: ~SolutionScreen(isOn == false);
+        ?a: Agent(title=="representative"; availability=="available");
+    }
+    then {
+        modify ?a {
+            availability = "not available";
+        };
+        System.out.println("a rep adds a new roll to " + ?k.name);
+        modify ?k {
+            paper = "high paper";
+        };
+        modify ?a {
+            availability = "available";
+        };
+    }
+};
+
+rule 3callRepToRefillPaper {
+    when {
+        ?k: Kiosk(paper=="low paper"; jam=="not jammed");
+        ?s: ~SolutionScreen(isOn == false);
+        ?a: Agent(title=="representative"; availability=="available");
+    }
+    then {
+        modify ?a {
+            availability = "not available";
+        };
+        System.out.println("a rep adds a new roll to " + ?k.name);
+        modify ?k {
+            paper = "high paper";
+        };
+        modify ?a {
+            availability = "available";
+        };
+    }
+};
+
+Given this setup, the following output is expected:
+setup {
+assert Kiosk("CarRental", "jammed", "low paper", "not available");
+assert Kiosk("Park", "not jammed", "low paper", "available");
+assert Agent("Technician", 1, "available");
+assert Agent("Representative", 2, "available");
+}
+
+CarRental is not available because paper jam //triggered by isJammed rule
+Park is available because of no jam and low paper //triggered by isPaperLow rule
+A tech removes jam from CarRental //triggered by 1callTechToRemoveJam rule
+A rep adds a new roll to CarRental //triggered by 2callRepToRefillPaper rule
+A rep adds a new roll to Park //triggered by 2callRepToRefillPaper rule
+Park is available //triggered by isPaperHigh rule
+CarRental is available //triggered by isPaperHigh rule
+
+
+Lets try another one:
+setup {
+assert Kiosk("CarRental", "jammed", "low paper", "not available");
+assert Kiosk("Park", "not jammed", "out of paper", " not available");
+assert Agent("Technician", 1, "available");
+assert Agent("Representative", 2, "available");
+}
+
+CarRental is not available because paper jam //triggered by isJammed rule
+Park is not available because out of paper //triggered by isPaperOut rule
+A tech removes jam from CarRental //triggered by 1callTechToRemoveJam rule
+A rep adds a new roll to CarRental //triggered by 3callRepToRefillPaper rule
+A rep adds a new roll to Park //triggered by 2callRepToRefillPaper rule
+Park is available //triggered by isPaperHigh rule
+CarRental is available //triggered by isPaperHigh rule
+
+
+Now lets update all th rules to with a new attribute isActive that on which screen they should be displayed
+
+-first all rules have to be updated to have a SolutionScreen(isOn == true) condition
+then we will initialize a InitialScreen object with the number of kiosks and agents in the system
+then we will display InitialScreen with this rule:
+rule 1displayInitialScreenTitle {
+    when {
+        ?s: InitialScreen(isOn == true);
+    }
+    then {
+        System.out.println("Initial Screen");
+        System.out.println("-----------------");
+
+    }
+};
+
+rule 2displayInitialScreenKiosks {
+    when {
+        ?s: InitialScreen(isOn == true);
+        ?k: Kiosk(); //this will match any kiosk
+    }
+    then {
+        System.out.println("Kiosk " + ?k.number + " : " + ?k.name + ", " + ?k.paper + ", " + ?k.jam);
+
+    }
+};
+
+rule 3displayInitialScreenAgents {
+    when {
+        ?s: InitialScreen(isOn == true);
+        ?a: Agent(); //this will match any agent
+
+    }
+    then {
+        System.out.println("Agent " + ?a.number + " : " + ?a.title);
+        modify ?s {
+            isOn = false;
+        };
+        assert StatusScreen(2, true); //this will display the status screen
+    }
+};
+
+then we will display StatusScreen with this rule:
+rule 1displayStatusScreenTitle {
+    when {
+        ?s: StatusScreen(isOn == true);
+    }
+    then {
+        System.out.println("Status Screen");
+        System.out.println("-----------------");
+
+    }
+};
+
+rule 2displayStatusScreenKiosks {
+    when {
+        ?s: StatusScreen(isOn == true);
+        ?k: Kiosk(); //this will match any kiosk
+    }
+    then {
+        System.out.println("Kiosk " + ?k.number + " " + ?k.name + " is " + ?k.availability + " because " + ?k.paper + " and " + ?k.jam));
+    }
+};
+
+rule 3displayStatusScreenAgents {
+    when {
+        ?s: StatusScreen(isOn == true);
+    }
+    then {
+        System.out.println("1 Technician and 1 Representatives are available");
+        modify ?s {
+            isOn = false;
+        };
+        assert SolutionScreen(true); //this will display the solution screen
+    }
+};
+
+then we will display SolutionScreen with this rule:
+rule displaySolutionScreenTitle {
+    priority = high;
+    when {
+        ?s: SolutionScreen(isOn == true);
+    }
+    then {
+        System.out.println("Solution Screen");
+        System.out.println("-----------------");
+
+    }
+};
+
+Once the SolutionScreen(isOn == true) condition is met, the resolving rules will be applied
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+heres the uml diagram for the kiosk system:
+
++-----------------+       +-----------------+       +-----------------+
+|                 |       |                 |       |                 |
+|    Initial      |       |     Status      |       |    Solution     |
+|     Screen      |       |     Screen      |       |     Screen      |
+|                 |       |                 |       |                 |
++-----------------+       +-----------------+       +-----------------+
+|                 |       |                 |       |                 |
+| -numOfKiosks    |       | -numOfKiosks    |       |                 |
+| -numOfAgents    |       | -isOn           |       | -isOn           |
+| -isOn           |       |                 |       |                 |
+|                 |       |                 |       |                 |
++-----------------+       +-----------------+       +-----------------+
+|                 |       |                 |       |                 |
+| +printTitle()   |       | +printTitle()   |       | +printTitle()   |
+| +printKiosks()  |       | +printKiosks()  |       | +printSolution()|
+| +printAgents()  |       | +printAgents()  |       |                 |
+|                 |       |                 |       |                 |
++-----------------+       +-----------------+       +-----------------+
+
++-----------------+       +-----------------+       +-----------------+
+|                 |       |                 |       |                 |
+|     Kiosk       |       |      Agent      |       |     Printer     |
+|                 |       |                 |       |                 |
++-----------------+       +-----------------+       +-----------------+
+|                 |       |                 |       |                 |
+| -name           |       | -title          |       |                 |
+| -number         |       | -number         |       |                 |
+| -jam            |       | -availability   |       |                 |
+| -paper          |       |                 |       |                 |
+| -availability   |       |                 |       |                 |
+| -initialScenario|       |                 |       |                 |
+| -initialStatus  |       |                 |       |                 |
+|                 |       |                 |       |                 |
++-----------------+       +-----------------+       +-----------------+
+|                 |       |                 |       |                 |
+
+
+
