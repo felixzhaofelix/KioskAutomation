@@ -67,7 +67,7 @@ rule isAvailable {
     }
     then {
         modify ?k {
-            availability = AVAIALABLE;
+            availability = AVAILABLE;
         };
     }
 };
