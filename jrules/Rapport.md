@@ -403,8 +403,8 @@ Voici la sortie de la simulation de l'exécution du système avec ce setup:
 ```jrules
 setup {
     assert InitialScreen(true);
-    assert Kiosk("CarRental", 1, "NOT_JAMMED", "LOW_PAPER");
-    assert Kiosk("Park", 2, "NOT_JAMMED", "HIGH_PAPER");
+    assert Kiosk("CarRental", 1, "JAMMED", "LOW_PAPER");
+    assert Kiosk("Park", 2, "NOT_JAMMED", "LOW_PAPER");
     assert Agent("TECHNICIAN", 1, "AVAILABLE");
     assert Agent("REPRESENTATIVE", 2, "AVAILABLE");
 }
@@ -420,8 +420,8 @@ Agent 2 : REPRESENTATIVE
 
 Status Screen
 -----------------
-Kiosk 1 CarRental is NOT AVAILABLE because LOW_PAPER and JAMMED
-Kiosk 2 Park is AVAILABLE because HIGH_PAPER and NOT_JAMMED
+Kiosk 1 CarRental is NOT_AVAILABLE because LOW_PAPER and JAMMED
+Kiosk 2 Park is AVAILABLE because LOW_PAPER and NOT_JAMMED
 1 Technician and 1 Representatives are available
 
 Solution Screen
@@ -429,7 +429,7 @@ Solution Screen
 CarRental is not available because paper jam //triggered by isJammed rule
 Park is available because of no jam and low paper //triggered by isPaperLow rule
 A tech removes jam from CarRental //triggered by 1callTechToRemoveJam rule
-CarRental is available because of no jam and low paper//triggered by isPaperLow rule
+CarRental is available because no jam and low paper//triggered by isPaperLow rule
 A rep adds a new roll to CarRental //triggered by 3callRepToRefillPaper rule
 CarRental is available //triggered by isPaperHigh rule
 A rep adds a new roll to Park //triggered by 3callRepToRefillPaper rule
@@ -457,8 +457,8 @@ Agent 2 : REPRESENTATIVE
 
 Status Screen
 -----------------
-Kiosk 1 CarRental is NOT AVAILABLE because JAMMED
-Kiosk 2 Park is NOT AVAILABLE because OUT_OF_PAPER
+Kiosk 1 CarRental is NOT_AVAILABLE because LOW_PAPER and JAMMED
+Kiosk 2 Park is NOT_AVAILABLE because OUT_OF_PAPER and NOT_JAMMED
 1 Technician and 1 Representatives are available
 
 Solution Screen
@@ -466,12 +466,12 @@ Solution Screen
 CarRental is not available because paper jam
 Park is not available because out of paper
 A tech removes jam from CarRental
-CarRental is available because of no jam and low paper
+CarRental is available because no jam and low paper
+A rep adds a new roll to Park
+Park is available
 A rep adds a new roll to CarRental
 CarRental is available
-Park is not available because out of paper
-A rep adds a new roll to Park
-Park is available 
+ 
 ```
 
 
