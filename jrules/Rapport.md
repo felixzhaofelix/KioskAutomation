@@ -6,9 +6,14 @@ les objets non statiques sont les objets qui sont créés par les utilisateurs d
 
 ###  Les objets statiques
 Les objets sont des écrans servant à afficher des informations aux utilisateurs. Ils sont créés en ordre:
+
 1. classe InitialScreen
+
 2. classe StatusScreen
+
 3. classe SolutionScreen
+
+
 Chacun de ces objets ne comprend qu'un seul attribut: isOn, qui indique si l'écran est allumé ou éteint.
 L'allumage et l'extinction des écrans sont gérés par les règles.
 
@@ -44,10 +49,11 @@ Les règles sont définies dans le but d'être déclenchées duran trois phases 
 pour chacun des écrans, leurs moments d'exécution sont gérés par priorité et
 par la lexicographie des noms des règles.
 
-### Phase du InitialScreen
+### Phase de déduction des disponibilités des kiosques, constante durant l'exécution du système
 
 Voici les règles dès l'initialisation du système, elles sont déclenchées par leur priorité et déduisent
-la valeur de l'attribut "Availability" de chaque kiosque en arrière-plan.
+la valeur de l'attribut "Availability" de chaque kiosque en arrière-plan c.-à-d. Les 
+résultats ne sont pas présentés à l'utilisateur. 
 
 ```jrules
 /*
@@ -57,11 +63,11 @@ la valeur de l'attribut "Availability" de chaque kiosque en arrière-plan.
 rule isAvailable {
     priority = high;
     when {
-        ?k: Kiosk(jam=="not jammed"; ~paper=="out of paper"); //the ~ means not
+        ?k: Kiosk(jam==NOT_JAMMED; ~paper==OUT_OF_PAPER); //the ~ means not
     }
     then {
         modify ?k {
-            availability = "available";
+            availability = AVAIALABLE;
         };
     }
 };
@@ -74,11 +80,11 @@ rule isAvailable {
 rule isNotAvailableBecauseJam {
     priority = high;
     when {
-        ?k: Kiosk(jam=="jammed");
+        ?k: Kiosk(jam==JAMMED);
     }
     then {
         modify ?k {
-            availability = "not available";
+            availability = NOT_AVAILABLE;
         };
     }
 };
@@ -90,16 +96,17 @@ rule isNotAvailableBecauseJam {
 rule isNotAvailableBecausePaper {
     priority = high;
     when {
-        ?k: Kiosk(paper=="out of paper");
+        ?k: Kiosk(paper=OUT_OF_PAPER);
     }
     then {
         modify ?k {
-            availability = "not available";
+            availability = NOT_AVAILABLE;
         };
     }
 };
 ```
-
+### Phase du InitialScreen
+Dans cette phase, nous présentons les scénarios initiaux.
 Ensuite, il y a les règles qui présentent des messages à l'utilisateur, 
 elles sont déclenchées par leur lexicographie.
 À cette phase, nous présentons les scénarios initiaux.
@@ -215,7 +222,7 @@ rule 3displayStatusScreenAgents {
 
 ### Phase du SolutionScreen
 Dans cette phase, nous allons résoudre le problème de chaque kiosque.
-Tout d'abord, nous allons allumer l'écran de solution:
+Tout d'abord, nous allons allumer l'écran de solution :
 Cette règle de priorité haute est déclenchée dès que l'écran de solution est allumé.
 ```jrules
 /*
@@ -279,7 +286,7 @@ rule isPaperOut {
 rule isPaperHigh{
     priority = medium;
     when {
-        ?k: Kiosk(paper=="HIGH_PAPER"; jam=="NOT_JAMMED");
+        ?k: Kiosk(paper==HIGH_PAPER; jam==NOT_JAMMED);
         ?s: SolutionScreen(isOn == true); //this rule will not be triggered when SolutionScreen is off
     }
     then {
@@ -295,7 +302,7 @@ rule isPaperHigh{
 rule isPaperLow{
     priority = medium;
     when {
-        ?k: Kiosk(paper=="LOW_PAPER"; jam=="NOT_JAMMED");
+        ?k: Kiosk(paper==LOW_PAPER; jam==NOT_JAMMED);
         ?s: SolutionScreen(isOn == true); //this rule will not be triggered when SolutionScreen is off
     }
     then {
@@ -306,7 +313,7 @@ rule isPaperLow{
 
 Le deuxième jeu de règles modifie les statuts des kiosques, ces règles se déclenchent
 par lexicographie, elles causent des changements dans le working memory du système.
-L'ordre lexicographique dicte l'ordre d'importance des règles:
+L'ordre lexicographique dicte l'ordre d'importance des règles :
 D'abord enlever le bourrage, ensuite remplir de papier pour les kiosques à court de papier,
 et finalement remplir de papier pour les kiosques à peu de papier.
 La conclusion de chaque règle modifie aussi la disponibilité des agents pour
@@ -323,20 +330,20 @@ les kiosques.
 */
 rule 1callTechToRemoveJam {
     when {
-        ?k: Kiosk(jam=="JAMMED");
+        ?k: Kiosk(jam==JAMMED);
         ?s: SolutionScreen(isOn == true);
-        ?a: Agent(title=="TECHNICIAN"; availability=="AVAILABLE");
+        ?a: Agent(title==TECHNICIAN; availability==AVAILABLE);
     }
     then {
         modify ?a {
-            availability = "NOT_AVAILABLE";
+            availability = NOT_AVAILABLE;
         };
         System.out.println("a tech removes jam from " + ?k.name);
         modify ?k {
-            jam = "NOT_JAMMED";
+            jam = NOT_JAMMED;
         };
         modify ?a {
-            availability = "AVAILABLE";
+            availability = AVAILABLE;
         };
     }
 };
@@ -351,20 +358,20 @@ rule 1callTechToRemoveJam {
 */
 rule 2callRepToRefillPaper {
     when {
-        ?k: Kiosk(paper=="OUT_OF_PAPER"; jam=="NOT_JAMMED");
+        ?k: Kiosk(paper==OUT_OF_PAPER; jam==NOT_JAMMED);
         ?s: SolutionScreen(isOn == true);
-        ?a: Agent(title=="REPRESENTATIVE"; availability=="AVAILABLE");
+        ?a: Agent(title==REPRESENTATIVE; availability==AVAILABLE);
     }
     then {
         modify ?a {
-            availability = "NOT AVAILABLE";
+            availability = NOT AVAILABLE;
         };
         System.out.println("a rep adds a new roll to " + ?k.name);
         modify ?k {
-            paper = "HIGH_PAPER";
+            paper = HIGH_PAPER;
         };
         modify ?a {
-            availability = "AVAILABLE";
+            availability = AVAILABLE;
         };
     }
 };
@@ -379,20 +386,20 @@ rule 2callRepToRefillPaper {
 */
 rule 3callRepToRefillPaper {
     when {
-        ?k: Kiosk(paper=="LOW_PAPER"; jam=="NOT_JAMMED");
+        ?k: Kiosk(paper==LOW_PAPER; jam==NOT_JAMMED);
         ?s: SolutionScreen(isOn == true); 
-        ?a: Agent(title=="REPRESENTATIVE"; availability=="AVAILABLE");
+        ?a: Agent(title==REPRESENTATIVE; availability==AVAILABLE);
     }
     then {
         modify ?a {
-            availability = "NOT AVAILABLE";
+            availability = NOT AVAILABLE;
         };
         System.out.println("a rep adds a new roll to " + ?k.name);
         modify ?k {
-            paper = "HIGH_PAPER";
+            paper = HIGH_PAPER;
         };
         modify ?a {
-            availability = "AVAILABLE";
+            availability = AVAILABLE;
         };
     }
 };
@@ -403,10 +410,10 @@ Voici la sortie de la simulation de l'exécution du système avec ce setup:
 ```jrules
 setup {
     assert InitialScreen(true);
-    assert Kiosk("CarRental", 1, "JAMMED", "LOW_PAPER");
-    assert Kiosk("Park", 2, "NOT_JAMMED", "LOW_PAPER");
-    assert Agent("TECHNICIAN", 1, "AVAILABLE");
-    assert Agent("REPRESENTATIVE", 2, "AVAILABLE");
+    assert Kiosk("CarRental", 1, JAMMED, LOW_PAPER);
+    assert Kiosk("Park", 2, NOT_JAMMED, LOW_PAPER);
+    assert Agent(TECHNICIAN, 1, AVAILABLE);
+    assert Agent(REPRESENTATIVE, 2, AVAILABLE);
 }
 ```
 
@@ -426,24 +433,24 @@ Kiosk 2 Park is AVAILABLE because LOW_PAPER and NOT_JAMMED
 
 Solution Screen
 -----------------
-CarRental is not available because paper jam //triggered by isJammed rule
-Park is available because of no jam and low paper //triggered by isPaperLow rule
-A tech removes jam from CarRental //triggered by 1callTechToRemoveJam rule
-CarRental is available because no jam and low paper//triggered by isPaperLow rule
-A rep adds a new roll to CarRental //triggered by 3callRepToRefillPaper rule
-CarRental is available //triggered by isPaperHigh rule
-A rep adds a new roll to Park //triggered by 3callRepToRefillPaper rule
-Park is available //triggered by isPaperHigh rule
+CarRental is not available because paper jam //triggered by isJammed rule, by priority
+Park is available because of no jam and low paper //triggered by isPaperLow rule, by priority
+A tech removes jam from CarRental //triggered by 1callTechToRemoveJam rule, by lexicography and refraction
+CarRental is available because no jam and low paper//triggered by isPaperLow rule, by priority
+A rep adds a new roll to CarRental //triggered by 3callRepToRefillPaper rule, by lexicography and refraction
+CarRental is available //triggered by isPaperHigh rule, by priority
+A rep adds a new roll to Park //triggered by 3callRepToRefillPaper rule, by lexicography and refraction
+Park is available //triggered by isPaperHigh rule, by priority
 ```
 
 Voici la sortie de la simulation de l'exécution du système avec ce setup:
 ```jrules
 setup {
     assert InitialScreen(true);
-    assert Kiosk("CarRental", 1, "JAMMED", "LOW_PAPER");
-    assert Kiosk("Park", 2, "NOT_JAMMED", "OUT_OF_PAPER");
-    assert Agent("TECHNICIAN", 1, "AVAILABLE");
-    assert Agent("REPRESENTATIVE", 2, "AVAILABLE");
+    assert Kiosk("CarRental", 1, LOW_PAPER, JAMMED);
+    assert Kiosk("Park", 2, OUT_OF_PAPER, NOT_JAMMED);
+    assert Agent(TECHNICIAN, 1, AVAILABLE);
+    assert Agent(REPRESENTATIVE, 2, AVAILABLE);
 }
 ```
 
@@ -463,14 +470,14 @@ Kiosk 2 Park is NOT_AVAILABLE because OUT_OF_PAPER and NOT_JAMMED
 
 Solution Screen
 -----------------
-CarRental is not available because paper jam
-Park is not available because out of paper
-A tech removes jam from CarRental
-CarRental is available because no jam and low paper
-A rep adds a new roll to Park
-Park is available
-A rep adds a new roll to CarRental
-CarRental is available
+CarRental is not available because paper jam  //triggered by isJammed rule, by priority
+Park is not available because out of paper //triggered by isPaperOut rule, by priority
+A tech removes jam from CarRental //triggered by 1callTechToRemoveJam rule, by lexicography and refraction
+CarRental is available because no jam and low paper //triggered by isPaperLow rule, priority
+A rep adds a new roll to Park //triggered by 2callRepToRefillPaper rule, by lexicography and refraction
+Park is available //triggered by isPaperHigh rule, by priority
+A rep adds a new roll to CarRental //triggered by 3callRepToRefillPaper rule, by lexicography and refraction
+CarRental is available //triggered by isPaperHigh rule, by priority
  
 ```
 
